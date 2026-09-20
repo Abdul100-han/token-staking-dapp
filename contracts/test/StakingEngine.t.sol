@@ -171,4 +171,30 @@ contract StakingEngineTest is Test {
         assertEq(stakingEngine.balances(alice), 0);
         assertEq(stakingToken.balanceOf(alice), initialBalance);
     }
+
+    function testFuzz_StakeAndWithdrawForUser(address user, uint256 amount) public {
+        vm.assume(user != address(0));
+        vm.assume(user != address(this));
+        vm.assume(user != address(stakingEngine));
+        vm.assume(user != address(stakingToken));
+        vm.assume(user != address(rewardToken));
+        assumeNotPrecompile(user);
+        assumeNotForgeAddress(user);
+
+        amount = bound(amount, 1, 1000 ether);
+
+        stakingToken.mint(user, amount);
+        uint256 initialBalance = stakingToken.balanceOf(user);
+
+        vm.startPrank(user);
+        stakingToken.approve(address(stakingEngine), amount);
+        stakingEngine.stake(amount);
+        vm.warp(block.timestamp + WARP_SECONDS);
+        stakingEngine.withdraw(amount);
+        vm.stopPrank();
+
+        assertEq(stakingEngine.balances(user), 0);
+        assertEq(stakingToken.balanceOf(user), initialBalance);
+        assertEq(stakingEngine.totalSupply(), 0);
+    }
 }
