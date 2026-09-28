@@ -9,7 +9,10 @@ export const config = getDefaultConfig({
     "YOUR_WALLETCONNECT_PROJECT_ID",
   chains: [sepolia],
   transports: {
-    [sepolia.id]: http(process.env.NEXT_PUBLIC_ALCHEMY_RPC_URL || undefined),
+    [sepolia.id]: http(
+      process.env.NEXT_PUBLIC_ALCHEMY_RPC_URL ||
+        "https://ethereum-sepolia-rpc.publicnode.com",
+    ),
   },
   ssr: true,
 });
