@@ -1,0 +1,29 @@
+name: Contract Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  contract-tests:
+    name: Foundry tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install dependencies
+        run: forge install
+
+      - name: Run Forge tests
+        run: forge test -vvv
