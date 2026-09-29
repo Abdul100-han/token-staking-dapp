@@ -341,7 +341,9 @@ export function StakingDashboard() {
 
             {error && (
               <p className="text-sm text-rose-400">
-                {error.shortMessage ?? error.message}
+                {"shortMessage" in error && typeof error.shortMessage === "string"
+                  ? error.shortMessage
+                  : error.message}
               </p>
             )}
           </div>
