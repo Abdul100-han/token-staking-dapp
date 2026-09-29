@@ -17,21 +17,17 @@ import {
 
 const FAUCET_AMOUNT = parseEther("100");
 
-function formatToken(value?: bigint, digits = 6) {
+function formatToken(value?: bigint) {
   if (value === undefined) {
     return "—";
   }
-
-  const formatted = formatEther(value);
-  const asNumber = Number(formatted);
-  if (!Number.isFinite(asNumber) || asNumber === 0) {
-    return asNumber === 0 ? "0" : formatted;
-  }
-  if (asNumber > 0 && asNumber < 1 / 10 ** digits) {
-    return formatted;
+  if (value === 0n) {
+    return "0";
   }
 
-  return asNumber.toFixed(Math.min(digits, 6)).replace(/\.?0+$/, "");
+  const [whole, fraction = ""] = formatEther(value).split(".");
+  const trimmedFraction = fraction.replace(/0+$/, "");
+  return trimmedFraction.length > 0 ? `${whole}.${trimmedFraction}` : whole;
 }
 
 export function StakingDashboard() {
@@ -208,7 +204,7 @@ export function StakingDashboard() {
     },
     {
       label: "Pending Rewards",
-      value: !mounted ? "…" : formatToken(pendingRewards, 12),
+      value: !mounted ? "…" : formatToken(pendingRewards),
       suffix: "RWD",
     },
   ];
@@ -234,7 +230,10 @@ export function StakingDashboard() {
             <p className="text-xs uppercase tracking-wide text-slate-400">
               {metric.label}
             </p>
-            <p className="mt-2 truncate text-2xl font-semibold text-white">
+            <p
+              title={metric.value}
+              className="mt-2 break-all text-lg font-semibold leading-snug text-white sm:text-xl"
+            >
               {metric.value}
             </p>
             <p className="text-xs text-slate-500">{metric.suffix}</p>
